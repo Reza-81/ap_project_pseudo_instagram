@@ -25,7 +25,7 @@ public class Message {
 	}
 	
 	public static Message send_message(String sender, long chat_id) {
-		System.out.println("neter your message:");
+		System.out.println("eneter your message:");
 		String text = GetInput.get_string();
 		list_messages.add(new Message(sender, chat_id, text));
 		return list_messages.get(list_messages.size() - 1);
@@ -58,7 +58,7 @@ public class Message {
 	}
 
 	public void show() {
-		System.out.println("========================================");
+		System.out.println("---------------------------");
 		System.out.println(sender + ":");
 		System.out.println(text + "\n");
 		System.out.println(date + "\n");

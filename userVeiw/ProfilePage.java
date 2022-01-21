@@ -11,7 +11,7 @@ import userManagement.User;
 public class ProfilePage {
 
 	public static void run(User user) throws NoSuchAlgorithmException, IOException {
-		user.show_user_information();
+		user.show_user_information(user.getUsername());
 		while(true) {
 			System.out.println("your posts: ");
 			ArrayList<Post> user_posts = Post.get_user_posts(user);

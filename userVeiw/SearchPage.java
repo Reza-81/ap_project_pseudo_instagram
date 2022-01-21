@@ -42,7 +42,9 @@ public class SearchPage {
 				System.out.println("there is no such username!");
 				continue;
 			}
-			searched_user.show_user_information();
+			if(!searched_user.show_user_information(user.getUsername())) {
+				break;
+			}
 			ArrayList<Post> user_posts = Post.get_user_posts(searched_user);
 			while(true) {
 				System.out.println(searched_user.getUsername() + " posts: ");
@@ -69,21 +71,31 @@ public class SearchPage {
 				}
 			}
 			if(!user.equals(searched_user)) {
-				if(user.getList_followings().contains(searched_user.getUsername())) {
-					System.out.println("*** if you want to Unfollow this user enter 1 or not enter 0: ");
-					input = GetInput.get_number();
-					if (input == 1) {
-						user.unfollow(searched_user);
-						System.out.println(searched_user.getUsername() + " unfollowed!");
-					}
-				}
-				else {
-					System.out.println("*** if you want to follow this user enter 1 or not enter 0: ");
-					input = GetInput.get_number();
-					if (input == 1) {
-						user.follow(searched_user);
+				System.out.println("if you want enter one of these options:");
+				System.out.println("1.follow");
+				System.out.println("2.unfollow");
+				System.out.println("3.block");
+				System.out.println("4.unblock");
+				System.out.println("5.skip");
+				int selectedOption = GetInput.get_number();
+				switch (selectedOption){
+					case 1:
+						user.follow(searched_user.getUsername());
 						System.out.println(searched_user.getUsername() + " added to followings!");
-					}
+						break;
+					case 2:
+						user.unfollow(searched_user.getUsername());
+						System.out.println(searched_user.getUsername() + " unfollowed!");
+					case 3:
+						user.block(searched_user.getUsername());
+						System.out.println(searched_user.getUsername() + " blocked!");
+						break;
+					case 4:
+						user.unblock(searched_user.getUsername());
+						System.out.println(searched_user.getUsername() + " unblocked!");
+						break;
+					case 5:
+						break;
 				}
 			}
 		}

@@ -8,6 +8,7 @@ import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Arrays;
 
+import authentication.Authentication;
 import tools.GetInput;
 import tools.ShowImage;
 
@@ -18,15 +19,17 @@ public class User {
 	private String username;
 	private String password;
 	private String email;
+	private String phone_number;
 	private String bio;
 	private String profile_picture;
 	private ArrayList<String> list_followings = new ArrayList<>();
 	private ArrayList<String> list_blocks = new ArrayList<>();
 	
-	public User(String username, String email, String bio, String password, String profile_picture) throws NoSuchAlgorithmException {
+	public User(String username, String email, String bio, String password, String profile_picture, String phone_number) throws NoSuchAlgorithmException {
 		MessageDigest md = MessageDigest.getInstance("SHA-256");
 		this.username = username;
 		this.email = email;
+		this.phone_number = phone_number;
 		this.bio = bio;
 		this.password = Arrays.toString(md.digest(password.getBytes(StandardCharsets.UTF_8)));
 		this.profile_picture = profile_picture;
@@ -44,6 +47,27 @@ public class User {
 		}
 		System.out.println("enter your email:");
 		String email = GetInput.get_string();
+		while(!Authentication.run(email)) {
+			System.out.println("***sory. your code is wrong!");
+			System.out.println("    1.change email\n"
+					         + "    2.recive new code\n"
+					         + "    3.cancel the process and back to login-signup page");
+			int select_option = GetInput.get_number();
+			switch(select_option){
+				case 1:
+					System.out.println("enter your email:");
+					email = GetInput.get_string();
+					break;
+				case 2:
+					break;
+				case 3:
+					return null;
+			}
+			
+		}
+		System.out.println("your code is corect!");
+		System.out.println("enter your phone number:");
+		String phone_number = GetInput.get_string();
 		System.out.println("enter your password:");
 		String password = GetInput.get_string();
 		System.out.println("enter your bio:");
@@ -51,7 +75,7 @@ public class User {
 		System.out.println("enter your prifile picture path:");
 		System.out.println(" like: E:\\advanced programing\\elon.jpg");
 		String profile_picture = GetInput.get_string();
-		list_users.add(new User(username, email, bio, password, profile_picture));
+		list_users.add(new User(username, email, bio, password, profile_picture, phone_number));
 		return list_users.get(list_users.size() - 1);
 	}
 	
@@ -64,20 +88,20 @@ public class User {
 		return null;
 	}
 	
-	public void follow(User user) {
-		user.list_followings.add(user.username);
+	public void follow(String username) {
+		list_followings.add(username);
 	}
 	
-	public void unfollow(User user) {
-		user.list_followings.remove(user.username);
+	public void unfollow(String username) {
+		list_followings.remove(username);
 	}
 	
-	public void block(User user) {
-		user.list_blocks.add(user.username);
+	public void block(String username) {
+		list_blocks.add(username);
 	}
 	
-	public void unblock(User user) {
-		user.list_blocks.remove(user.username);
+	public void unblock(String username) {
+		list_blocks.remove(username);
 	}
 	
 	public String getUsername() {
@@ -129,7 +153,12 @@ public class User {
 		return list_followers;
 	}
 	
-	public void show_user_information() throws IOException {
+	public boolean show_user_information(String user) throws IOException {
+		if(list_blocks.contains(user)) {
+			System.out.println("***you can't see the " + username + " posts and profile!");
+			System.out.println("   because you blocked by " + username);
+			return false;
+		}
 		ShowImage.run(new File(profile_picture));
 		System.out.println("===========================");
 		System.out.println("username: " + username);
@@ -138,6 +167,7 @@ public class User {
 		System.out.println("followers: " + get_followers(username).size());
 		System.out.println("bio: " + bio);
 		System.out.println("===========================");
+		return true;
 	}
 
 	public static User login() throws NoSuchAlgorithmException{
@@ -166,6 +196,14 @@ public class User {
 		ArrayList<User> random_users = new ArrayList<>();
 		random_users.add(list_users.get((int)(Math.random() * list_users.size())));
 		return random_users;
+	}
+
+	public String getPhone_number() {
+		return phone_number;
+	}
+
+	public void setPhone_number(String phone_number) {
+		this.phone_number = phone_number;
 	}
 	
 }

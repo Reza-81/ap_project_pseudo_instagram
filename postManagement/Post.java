@@ -22,13 +22,14 @@ public class Post {
 	private ArrayList<String> list_tags = new ArrayList<>();
 	private ArrayList<String> list_likes = new ArrayList<>();
 	
-	public Post(String username, String caption, String file_path) throws NoSuchAlgorithmException {
+	public Post(String username, String caption, String file_path, ArrayList<String> list_tags) throws NoSuchAlgorithmException {
 		idForPosts ++;
 		this.id = idForPosts;
 		this.username = username;
 		this.file_path = file_path;
 		this.date = LocalDateTime.now();
 		this.caption = caption;
+		this.list_tags = list_tags;
 	}
 	
 	public static Post creat_post(String username) throws NoSuchAlgorithmException {
@@ -37,7 +38,21 @@ public class Post {
 		String file_path = GetInput.get_string();
 		System.out.println("*** enter your caption");
 		String caption = GetInput.get_string();
-		list_posts.add(new Post(username, caption, file_path));
+		System.out.println("if you want to tag some one, enter the username:");
+		System.out.println("after tags people, enter 0:");
+		ArrayList<String> list_tags = new ArrayList<>();
+		while(true) {
+			String temp = GetInput.get_string();
+			if (temp.equals("0")) {
+				break;
+			}
+			if(User.search(temp) == null) {
+				System.out.println("there is no such username! enter enother one:");
+				continue;
+			}
+			list_tags.add(temp);
+		}
+		list_posts.add(new Post(username, caption, file_path, list_tags));
 		return list_posts.get(list_posts.size() - 1);
 	}
 	
@@ -130,14 +145,23 @@ public class Post {
 		return following_posts;
 	}
 	
-	public void show_post(Post post, User user) throws NoSuchAlgorithmException, IOException {
+	public boolean show_post(Post post, User user) throws NoSuchAlgorithmException, IOException {
+		if(User.search(username).getList_blocks().contains(user.getUsername())) {
+			System.out.println("you can't see the " + username + " posts and profile!\n");
+			System.out.println("because you blocked by " + username);
+			return false;
+		}
 		System.out.println("===========================");
 		System.out.println("post id = " + id);
 		System.out.println("owner : " + username);
 		System.out.println("date = " + date);
-		System.out.println("description: " + caption);
+		System.out.println("caption: " + caption);
 		System.out.println("likes " + list_likes.size());
 		System.out.println("comments " + Comment.get_comments(id).size());
+		System.out.println("taged people:");
+		for(String tag : list_tags) {
+			System.out.println("  " + tag);
+		}
 		System.out.println("===========================");
 		ShowImage.run(new File(file_path));
 		
@@ -145,7 +169,7 @@ public class Post {
 			System.out.println("*if you want to dislike the post enter 1 or not enter 0: ");
 			if(GetInput.get_number() == 1) {
 				post.dislike(user.getUsername());
-				System.out.println("you liked this post!");
+				System.out.println("you disliked this post!");
 			}
 		}
 		else {
@@ -170,6 +194,7 @@ public class Post {
 			Comment.put_comment(user.getUsername(), id);
 			System.out.println("you commented on this post!");
 		}
+		return true;
 	}
 
 	public static ArrayList<Post> get_expelor() {

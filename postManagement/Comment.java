@@ -25,7 +25,6 @@ public class Comment {
 	}
 	
 	public static Comment put_comment(String username, long post_id) {
-		System.out.println("enter your comment:");
 		String text = GetInput.get_string();
 		list_comments.add(new Comment(post_id, username, text));
 		return list_comments.get(list_comments.size() - 1);

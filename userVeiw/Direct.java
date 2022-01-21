@@ -13,10 +13,10 @@ public class Direct {
 
 	public static void run(User user, Chat chat) throws NoSuchAlgorithmException {
 		if(chat instanceof PrivateChat) {
-			System.out.println("*** welcom to the " + ((PrivateChat) chat).getName(user.getUsername()) + ":");
+			System.out.println("*** welcom to the '" + ((PrivateChat) chat).getName(user.getUsername()) + "' chat:");
 		}
 		else {
-			System.out.println("*** welcom to the " + ((GroupChat) chat).getName() + ":");
+			System.out.println("*** welcom to the '" + ((GroupChat) chat).getName() + "' chat:");
 		}
 		System.out.println("-1.back");
 		System.out.println(" 0.refresh the page");
