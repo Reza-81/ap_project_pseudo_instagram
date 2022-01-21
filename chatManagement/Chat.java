@@ -3,6 +3,8 @@ package chatManagement;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 
+import userManagement.User;
+
 public class Chat {
 	private static long idForChats = -1;
 	protected static ArrayList<Chat> list_chats = new ArrayList<>();
@@ -38,12 +40,24 @@ public class Chat {
 		return id;
 	}
 	
-	public static Chat search(long id) {
-		for(Chat chat : list_chats) {
-			if(chat.id == id) {
-				return chat;
+	public static Chat search(long chat_id, String username) {
+		for (Chat chat : list_chats) {
+			if (chat.id == chat_id ) {
+				if(chat instanceof PrivateChat) {
+					if(((PrivateChat)chat).show_permission(username)) {
+						return chat;
+					}
+				}
+				if (chat instanceof GroupChat) {
+					if(((GroupChat)chat).show_permission(username)) {
+						return chat;
+					}
+				}
+				System.out.println("*** your permission denied ***");
+				return null;
 			}
 		}
+		System.out.println("*** there is no chat with this id ***");
 		return null;
 	}
 	
@@ -52,6 +66,24 @@ public class Chat {
 			return;
 		}
 		list_chats.add(chat);
+	}
+
+	public static void show_chats(User user) {
+		System.out.println("your cahts:\n"
+				         + "==============================");
+		for (Chat chat : list_chats) {
+			if (chat instanceof PrivateChat) {
+				if (((PrivateChat) chat).show_permission(user.getUsername())) {
+					System.out.println(((PrivateChat) chat).getName(user.getUsername()) + "->" + chat.id);
+				}
+			}
+			else if(chat instanceof GroupChat) {
+				if (((GroupChat) chat).show_permission(user.getUsername())) {
+					System.out.println(((GroupChat) chat).getName() + "->" + chat.id);
+				}
+			}
+		}
+		System.out.println("==============================");
 	}
 
 }

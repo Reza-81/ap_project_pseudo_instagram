@@ -1,10 +1,13 @@
 package postManagement;
 
+import java.io.File;
+import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 
 import tools.GetInput;
+import tools.ShowImage;
 import userManagement.User;
 
 public class Post {
@@ -38,12 +41,12 @@ public class Post {
 		return list_posts.get(list_posts.size() - 1);
 	}
 	
-	public void like(User user) {
-		list_likes.add(user.getUsername());
+	public void like(String username) {
+		list_likes.add(username);
 	}
 	
-	public void dislike(User user) {
-		list_likes.remove(user.getUsername());
+	public void dislike(String username) {
+		list_likes.remove(username);
 	}
 	
 	public long getId() {
@@ -84,7 +87,7 @@ public class Post {
 		list_posts.remove(post);
 	}
 
-	public String getUser() {
+	public String getUsername() {
 		return username;
 	}
 	
@@ -114,4 +117,78 @@ public class Post {
 	public void setFile_path(String file_path) {
 		this.file_path = file_path;
 	}
+
+	public static ArrayList<Post> get_following_posts(User user) {
+		ArrayList<Post> following_posts = new ArrayList<>();
+		for(Post post : list_posts) {
+			for(String following : user.getList_followings()) {
+				if(post.username.equals(following)) {
+					following_posts.add(post);
+				}
+			}
+		}
+		return following_posts;
+	}
+	
+	public void show_post(Post post, User user) throws NoSuchAlgorithmException, IOException {
+		System.out.println("===========================");
+		System.out.println("post id = " + id);
+		System.out.println("owner : " + username);
+		System.out.println("date = " + date);
+		System.out.println("description: " + caption);
+		System.out.println("likes " + list_likes.size());
+		System.out.println("comments " + Comment.get_comments(id).size());
+		System.out.println("===========================");
+		ShowImage.run(new File(file_path));
+		
+		if(list_likes.contains(user.getUsername())) {
+			System.out.println("*if you want to dislike the post enter 1 or not enter 0: ");
+			if(GetInput.get_number() == 1) {
+				post.dislike(user.getUsername());
+				System.out.println("you liked this post!");
+			}
+		}
+		else {
+			System.out.println("*if you want to like the post enter 1 or not enter 0: ");
+			if(GetInput.get_number() == 1) {
+				post.like(user.getUsername());
+				System.out.println("you liked this post!");
+			}
+		}
+		
+		System.out.println("*if you want to see the comments enter 1 or not enter 0: ");
+		if(GetInput.get_number() == 1) {
+			for(Comment comment : Comment.get_comments(id)) {
+				comment.show_comment();
+			}
+			System.out.println("===========================");
+		}
+		
+		System.out.println("*if you want put comment enter 1 or not enter 0: ");
+		if(GetInput.get_number() == 1) {
+			System.out.println("enter your comment:");
+			Comment.put_comment(user.getUsername(), id);
+			System.out.println("you commented on this post!");
+		}
+	}
+
+	public static ArrayList<Post> get_expelor() {
+		if(list_posts.size() <= 20) {
+			return list_posts;
+		}
+		ArrayList<Post> expelor_posts = new ArrayList<>();
+		expelor_posts.add(list_posts.get((int)(Math.random() * list_posts.size())));
+		return expelor_posts;
+	}
+
+	public static ArrayList<Post> get_user_posts(User user) {
+		ArrayList<Post> user_posts = new ArrayList<>();
+		for(Post post : list_posts) {
+			if(post.username.equals(user.getUsername())) {
+				user_posts.add(post);
+			}
+		}
+		return user_posts;
+	}
+	
 }

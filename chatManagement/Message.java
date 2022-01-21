@@ -56,5 +56,12 @@ public class Message {
 		}
 		return chat_messages;
 	}
+
+	public void show() {
+		System.out.println("========================================");
+		System.out.println(sender + ":");
+		System.out.println(text + "\n");
+		System.out.println(date + "\n");
+	}
 	
 }

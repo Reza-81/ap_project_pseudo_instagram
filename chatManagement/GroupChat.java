@@ -86,5 +86,19 @@ public class GroupChat extends Chat {
 	public String getName() {
 		return name;
 	}
+
+	public boolean show_permission(String username) {
+		for(String member : list_members) {
+			if (member.equals(username)) {
+				return true;
+			}
+		}
+		for(String admin : list_admins) {
+			if (admin.equals(username)) {
+				return true;
+			}
+		}
+		return false;
+	}
 	
 }

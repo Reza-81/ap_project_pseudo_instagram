@@ -46,4 +46,18 @@ public class PrivateChat extends Chat{
 	public String getUser2() {
 		return user2;
 	}
+
+	public boolean show_permission(String username) {
+		if (user1.equals(username) || user2.equals(username)) {
+			return true;
+		}
+		return false;
+	}
+
+	public String getName(String username) {
+		if(user1.equals(username)) {
+			return user2;
+		}
+		return user1;
+	}
 }

@@ -1,5 +1,7 @@
 package userManagement;
 
+import java.io.File;
+import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -7,6 +9,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 import tools.GetInput;
+import tools.ShowImage;
 
 public class User {
 
@@ -126,7 +129,8 @@ public class User {
 		return list_followers;
 	}
 	
-	public void show_user_information(String username) {
+	public void show_user_information() throws IOException {
+		ShowImage.run(new File(profile_picture));
 		System.out.println("===========================");
 		System.out.println("username: " + username);
 		System.out.println("email: " + email);
@@ -134,6 +138,34 @@ public class User {
 		System.out.println("followers: " + get_followers(username).size());
 		System.out.println("bio: " + bio);
 		System.out.println("===========================");
+	}
+
+	public static User login() throws NoSuchAlgorithmException{
+		MessageDigest md = MessageDigest.getInstance("SHA-256");
+		System.out.println("enter your username: ");
+		String username = GetInput.get_string();
+    	for(User user : list_users) {
+        	if (user.username.equals(username)) {
+        		System.out.println("enter your password: ");
+        		String password = GetInput.get_string();
+        		if(user.password.equals(Arrays.toString(md.digest(password.getBytes(StandardCharsets.UTF_8))))) {
+        			return user;
+        		}
+        		System.out.println("your password is wrong!");
+            	return null;
+        	}
+    	}
+    	System.out.println("there is no such username!");
+    	return null;
+	}
+
+	public static ArrayList<User> show_random_user() {
+		if(list_users.size() <= 20) {
+			return list_users;
+		}
+		ArrayList<User> random_users = new ArrayList<>();
+		random_users.add(list_users.get((int)(Math.random() * list_users.size())));
+		return random_users;
 	}
 	
 }

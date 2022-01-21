@@ -60,5 +60,12 @@ public class Comment {
 		}
 		return post_comments;
 	}
+
+	public void show_comment() {
+		System.out.println("comment id:" + id);
+		System.out.println("owner:" + username);
+		System.out.println("date: " + date);
+		System.out.println("comment: " + text);
+	}
 	
 }
