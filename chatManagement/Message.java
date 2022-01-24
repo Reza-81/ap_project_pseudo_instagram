@@ -1,8 +1,12 @@
 package chatManagement;
 
+import java.security.NoSuchAlgorithmException;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 
+import database.MessageDatabase;
 import tools.GetInput;
 
 public class Message {
@@ -12,22 +16,44 @@ public class Message {
 	private long id;
 	private long chat_id;
 	private String text;
-	private LocalDateTime date;
+	private String date;
 	private String sender;
 	
-	public Message(String sender, long chat_id, String text){
-		idForMessages ++;
-		this.id = idForMessages;
+	public Message(long id, String sender, long chat_id, String text, String date){
+		this.id = id;
 		this.chat_id = chat_id;
 		this.sender = sender;
-		this.date = LocalDateTime.now();
+		this.date = date;
 		this.text = text;
 	}
 	
-	public static Message send_message(String sender, long chat_id) {
+	public static void load_message_from_database() throws NoSuchAlgorithmException, SQLException, ClassNotFoundException {
+		MessageDatabase data = new MessageDatabase();
+		ResultSet result;
+		
+		result = data.getMessageDatabase();
+		Message message;
+		while(result.next()) {
+			idForMessages = Long.parseLong(result.getString("id"));
+//			System.out.println(result.getString("id"));
+//			System.out.println(result.getString("chat_id"));
+//			System.out.println(result.getString("username"));
+//			System.out.println(result.getString("date"));
+//			System.out.println(result.getString("txt"));
+			message = new Message(Long.parseLong(result.getString("id"))
+					        , result.getString("username"), Long.parseLong(result.getString("chat_id"))
+					        , result.getString("txt"), result.getString("date"));
+			list_messages.add(message);
+		}
+	}
+	
+	public static Message send_message(String sender, long chat_id) throws ClassNotFoundException, SQLException {
 		System.out.println("eneter your message:");
 		String text = GetInput.get_string();
-		list_messages.add(new Message(sender, chat_id, text));
+		idForMessages ++;
+		list_messages.add(new Message(idForMessages, sender, chat_id, text, LocalDateTime.now().toString()));
+		
+		MessageDatabase.addMessage(Long.toString(idForMessages), Long.toString(chat_id), text, LocalDateTime.now().toString(), sender);
 		return list_messages.get(list_messages.size() - 1);
 	}
 	
@@ -39,7 +65,7 @@ public class Message {
 		return text;
 	}
 	
-	public LocalDateTime getDate() {
+	public String getDate() {
 		return date;
 	}
 	

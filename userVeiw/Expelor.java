@@ -2,6 +2,7 @@ package userVeiw;
 
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
+import java.sql.SQLException;
 import java.util.ArrayList;
 
 import postManagement.Post;
@@ -10,7 +11,7 @@ import userManagement.User;
 
 public class Expelor {
 
-	public static void run(User user) throws NoSuchAlgorithmException, IOException {
+	public static void run(User user) throws NoSuchAlgorithmException, IOException, ClassNotFoundException, SQLException {
 		System.out.println("*** in this page you can see 20 random posts.\n"
 				         + "    you cansee the each post with 'post_id'.\n"
 				         + "    to back to the previos page enter -1\n");
@@ -22,6 +23,7 @@ public class Expelor {
 				System.out.println("===========================");
 				return;
 			}
+			System.out.println("posts: ");
 			System.out.println("===========================");
 			for(Post post : expelor_posts) {
 				System.out.println(post.getUsername() + "->" + post.getId());

@@ -6,7 +6,7 @@ import java.util.*;
 
 public class SendEmail {
 	final static String senderEmail = "@gmail.com"; //change email address
-	final static String senderPassword = "*****"; //change password
+	final static String senderPassword = "****"; //change password
 	final static String emailSMTPserver = "smtp.gmail.com";
 	final static String emailServerPort = "465";
 	

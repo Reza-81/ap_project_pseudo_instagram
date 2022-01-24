@@ -1,8 +1,11 @@
 package chatManagement;
 
 import java.security.NoSuchAlgorithmException;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 
+import database.ChatDatabase;
 import tools.GetInput;
 import userManagement.User;
 
@@ -12,13 +15,33 @@ public class GroupChat extends Chat {
 	private ArrayList<String> list_admins = new ArrayList<>();
 	private String name;
 	
-	public GroupChat(String name, ArrayList<String> list_members, ArrayList<String> list_admins) throws NoSuchAlgorithmException {
+	public GroupChat(long id, String name, ArrayList<String> list_members, ArrayList<String> list_admins) throws NoSuchAlgorithmException {
+		super(id);
 		this.name = name;
 		this.list_members = list_members;
 		this.list_admins = list_admins;
 	}
 	
-	public static GroupChat creat_Group_chat(String username) throws NoSuchAlgorithmException {
+	public static void load_group_from_database() throws NoSuchAlgorithmException, SQLException, ClassNotFoundException {
+		ChatDatabase data = new ChatDatabase();
+		ResultSet result;
+		
+		result = data.getChatDatabase();
+		GroupChat chat;
+		while(result.next()) {
+			if(result.getString("type").equals("group")) {
+				if(idForChats < Long.parseLong(result.getString("id"))) {
+					idForChats = Long.parseLong(result.getString("id"));
+				}
+				chat = new GroupChat(Long.parseLong(result.getString("id")), result.getString("name")
+						             , GetInput.get_list(result.getString("list_members"))
+						             , GetInput.get_list(result.getString("list_admins")));
+				list_chats.add(chat);
+			}
+		}
+	}
+	
+	public static GroupChat creat_Group_chat(String username, long id) throws NoSuchAlgorithmException, ClassNotFoundException, SQLException {
 		ArrayList<String> members = new ArrayList<>();
 		ArrayList<String> admins = new ArrayList<>();
 		
@@ -52,7 +75,8 @@ public class GroupChat extends Chat {
 			admins.add(admin);
 		}
 		admins.add(username);
-		return new GroupChat(name, members, admins);
+		ChatDatabase.addChat(Long.toString(id), "group", "null", "null", name, members, admins);
+		return new GroupChat(id, name, members, admins);
 	}
 	
 	public ArrayList<String> getList_members() {

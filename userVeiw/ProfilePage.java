@@ -2,6 +2,7 @@ package userVeiw;
 
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
+import java.sql.SQLException;
 import java.util.ArrayList;
 
 import postManagement.Post;
@@ -10,7 +11,7 @@ import userManagement.User;
 
 public class ProfilePage {
 
-	public static void run(User user) throws NoSuchAlgorithmException, IOException {
+	public static void run(User user) throws NoSuchAlgorithmException, IOException, ClassNotFoundException, SQLException {
 		user.show_user_information(user.getUsername());
 		while(true) {
 			System.out.println("your posts: ");
@@ -21,7 +22,6 @@ public class ProfilePage {
 				System.out.println("===========================");
 				return;
 			}
-			System.out.println(user_posts);
 			System.out.println("===========================");
 			for(Post post : user_posts) {
 				System.out.println(post.getUsername() + "->" + post.getId());

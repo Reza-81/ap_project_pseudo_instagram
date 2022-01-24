@@ -5,10 +5,13 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 
 import authentication.Authentication;
+import database.UserDatabase;
 import tools.GetInput;
 import tools.ShowImage;
 
@@ -26,16 +29,30 @@ public class User {
 	private ArrayList<String> list_blocks = new ArrayList<>();
 	
 	public User(String username, String email, String bio, String password, String profile_picture, String phone_number) throws NoSuchAlgorithmException {
-		MessageDigest md = MessageDigest.getInstance("SHA-256");
 		this.username = username;
 		this.email = email;
 		this.phone_number = phone_number;
 		this.bio = bio;
-		this.password = Arrays.toString(md.digest(password.getBytes(StandardCharsets.UTF_8)));
+		this.password = password;
 		this.profile_picture = profile_picture;
 	}
 	
-	public static User creat_account() throws NoSuchAlgorithmException {
+	public static void load_user_from_database() throws NoSuchAlgorithmException, SQLException, ClassNotFoundException {
+		UserDatabase data = new UserDatabase();
+		ResultSet result;
+		
+		result = data.getUserDatabase();
+		User user;
+		while(result.next()) {
+			user = new User(result.getString("username"), result.getString("email"), result.getString("bio")
+				, result.getString("password"), result.getString("profile_picture"), result.getString("phone_number"));
+			user.list_blocks = GetInput.get_list(result.getString("list_blocks"));
+			user.list_followings = GetInput.get_list(result.getString("list_followings"));
+			list_users.add(user);
+		}
+	}
+	
+	public static User creat_account() throws NoSuchAlgorithmException, ClassNotFoundException, SQLException {
 		System.out.println("enter your username:");
 		String username;
 		while(true) {
@@ -70,12 +87,22 @@ public class User {
 		String phone_number = GetInput.get_string();
 		System.out.println("enter your password:");
 		String password = GetInput.get_string();
+		MessageDigest md = MessageDigest.getInstance("SHA-256");
+		String password_hash = Arrays.toString(md.digest(password.getBytes(StandardCharsets.UTF_8)));
 		System.out.println("enter your bio:");
 		String bio = GetInput.get_string();
 		System.out.println("enter your prifile picture path:");
 		System.out.println(" like: E:\\advanced programing\\elon.jpg");
 		String profile_picture = GetInput.get_string();
-		list_users.add(new User(username, email, bio, password, profile_picture, phone_number));
+		list_users.add(new User(username, email, bio, password_hash, profile_picture, phone_number));
+		
+		ArrayList<String> temp = new ArrayList<>();
+		UserDatabase.addUser(username, email, bio
+				            , password_hash
+				            , profile_picture
+				            , phone_number
+				            , temp
+				            , temp);
 		return list_users.get(list_users.size() - 1);
 	}
 	
@@ -88,20 +115,24 @@ public class User {
 		return null;
 	}
 	
-	public void follow(String username) {
-		list_followings.add(username);
+	public void follow(String followed_username) throws ClassNotFoundException, SQLException {
+		list_followings.add(followed_username);
+		UserDatabase.update_list_followings(list_followings, username);
 	}
 	
-	public void unfollow(String username) {
-		list_followings.remove(username);
+	public void unfollow(String followed_username) throws ClassNotFoundException, SQLException {
+		list_followings.remove(followed_username);
+		UserDatabase.update_list_followings(list_followings, username);
 	}
 	
-	public void block(String username) {
-		list_blocks.add(username);
+	public void block(String blocked_username) throws ClassNotFoundException, SQLException {
+		list_blocks.add(blocked_username);
+		UserDatabase.update_list_blocks(list_blocks, username);
 	}
 	
-	public void unblock(String username) {
-		list_blocks.remove(username);
+	public void unblock(String blocked_username) throws ClassNotFoundException, SQLException {
+		list_blocks.remove(blocked_username);
+		UserDatabase.update_list_blocks(list_blocks, username);
 	}
 	
 	public String getUsername() {

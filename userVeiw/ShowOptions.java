@@ -2,6 +2,7 @@ package userVeiw;
 
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
+import java.sql.SQLException;
 
 import postManagement.Post;
 import tools.GetInput;
@@ -9,7 +10,7 @@ import userManagement.User;
 
 public class ShowOptions {
 
-	public static void run(User user) throws NoSuchAlgorithmException, IOException {
+	public static void run(User user) throws NoSuchAlgorithmException, IOException, ClassNotFoundException, SQLException {
 		while(true) {
 			System.out.println("-1.exit");
 		    System.out.println(" 1.home page");

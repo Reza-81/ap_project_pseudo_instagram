@@ -2,12 +2,13 @@ package userVeiw;
 
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
+import java.sql.SQLException;
 
 import tools.GetInput;
 import userManagement.User;
 
 public class LoginSignupPage {
-	public static void run() throws NoSuchAlgorithmException, IOException{
+	public static void run() throws NoSuchAlgorithmException, IOException, ClassNotFoundException, SQLException{
 		while(true) {
 			System.out.println("-1.exit");
 		    System.out.println(" 1.login");

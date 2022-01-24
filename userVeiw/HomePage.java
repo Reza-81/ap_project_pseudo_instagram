@@ -2,6 +2,7 @@ package userVeiw;
 
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
+import java.sql.SQLException;
 import java.util.ArrayList;
 
 import postManagement.Post;
@@ -10,7 +11,7 @@ import userManagement.User;
 
 public class HomePage {
 
-	public static void run(User user) throws NoSuchAlgorithmException, IOException{
+	public static void run(User user) throws NoSuchAlgorithmException, IOException, ClassNotFoundException, SQLException{
 		System.out.println("*** in this page you can see you can see your\n"
 				         + "    followings posts. you can see the\n"
 				         + "    each post with 'post_id'.\n"

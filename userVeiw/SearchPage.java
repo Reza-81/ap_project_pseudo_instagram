@@ -2,6 +2,7 @@ package userVeiw;
 
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
+import java.sql.SQLException;
 import java.util.ArrayList;
 
 import postManagement.Post;
@@ -10,11 +11,12 @@ import userManagement.User;
 
 public class SearchPage {
 
-	public static void run(User user) throws NoSuchAlgorithmException, IOException {
+	public static void run(User user) throws NoSuchAlgorithmException, IOException, ClassNotFoundException, SQLException {
 		System.out.println("*** in this page you can see the random users and follow them.\n"
 						 + "    or you can search specific 'username' and see it's page.\n"
 						 + "    to back to the previos page enter -1\n");
 		while(true) {
+			ArrayList<Post> user_posts = new ArrayList<>();
 			ArrayList<User> random_users = User.show_random_user();
 			if(random_users.isEmpty()) {
 				System.out.println("===========================");
@@ -45,38 +47,14 @@ public class SearchPage {
 			if(!searched_user.show_user_information(user.getUsername())) {
 				break;
 			}
-			ArrayList<Post> user_posts = Post.get_user_posts(searched_user);
-			while(true) {
-				System.out.println(searched_user.getUsername() + " posts: ");
-				if (user_posts.isEmpty()) {
-					System.out.println("===========================");
-					System.out.println("sorry. there is no post yet!");
-					System.out.println("===========================");
-					break;
-				}
-				System.out.println("===========================");
-				for(Post post : user_posts) {
-					System.out.println(post.getUsername() + "->" + post.getId());
-				}
-				System.out.println("===========================");
-				System.out.println("*** if you want to see posts\n"
-								 + "    enter 'post_id' or enter -1 to back:");
-				int post_id = GetInput.get_number();
-				if(post_id == -1) {
-					break;
-				}
-				Post post = Post.search(post_id);
-				if (post != null) {
-					post.show_post(post, user);
-				}
-			}
 			if(!user.equals(searched_user)) {
 				System.out.println("if you want enter one of these options:");
 				System.out.println("1.follow");
 				System.out.println("2.unfollow");
 				System.out.println("3.block");
 				System.out.println("4.unblock");
-				System.out.println("5.skip");
+				System.out.println("5.see posts");
+				System.out.println("6.skip");
 				int selectedOption = GetInput.get_number();
 				switch (selectedOption){
 					case 1:
@@ -95,7 +73,62 @@ public class SearchPage {
 						System.out.println(searched_user.getUsername() + " unblocked!");
 						break;
 					case 5:
+						while(true) {
+							user_posts = Post.get_user_posts(searched_user);
+							System.out.println(searched_user.getUsername() + " posts: ");
+							if (user_posts.isEmpty()) {
+								System.out.println("===========================");
+								System.out.println("sorry. there is no post yet!");
+								System.out.println("===========================");
+								break;
+							}
+							System.out.println("===========================");
+							for(Post post : user_posts) {
+								System.out.println(post.getUsername() + "->" + post.getId());
+							}
+							System.out.println("===========================");
+							System.out.println("*** if you want to see posts\n"
+											 + "    enter 'post_id' or enter -1 to back:");
+							int post_id = GetInput.get_number();
+							if(post_id == -1) {
+								break;
+							}
+							Post post = Post.search(post_id);
+							if (post != null) {
+								post.show_post(post, user);
+							}
+						}
 						break;
+					
+					case 6:
+						break;
+				}
+			}
+			else {
+				while(true) {
+					user_posts = Post.get_user_posts(searched_user);
+					System.out.println(searched_user.getUsername() + " posts: ");
+					if (user_posts.isEmpty()) {
+						System.out.println("===========================");
+						System.out.println("sorry. there is no post yet!");
+						System.out.println("===========================");
+						break;
+					}
+					System.out.println("===========================");
+					for(Post post : user_posts) {
+						System.out.println(post.getUsername() + "->" + post.getId());
+					}
+					System.out.println("===========================");
+					System.out.println("*** if you want to see posts\n"
+									 + "    enter 'post_id' or enter -1 to back:");
+					int post_id = GetInput.get_number();
+					if(post_id == -1) {
+						break;
+					}
+					Post post = Post.search(post_id);
+					if (post != null) {
+						post.show_post(post, user);
+					}
 				}
 			}
 		}

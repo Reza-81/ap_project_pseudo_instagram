@@ -1,5 +1,7 @@
 package tools;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Scanner;
 
 public class GetInput {
@@ -20,6 +22,18 @@ public class GetInput {
 
 	public static String get_string() {
 		return scanner.nextLine();
+	}
+	
+	public static ArrayList<String> get_list(String string) {
+		String string2 = string.substring(1, string.length()-1);
+		if(string2 != "") {
+		String[] string3 = string2.split(",");
+			for(int i=0; i<string3.length; i++) {
+				string3[i] = string3[i].strip();
+			}
+			return new ArrayList<String>(Arrays.asList(string3));
+		}
+		return new ArrayList<>();
 	}
 }
 

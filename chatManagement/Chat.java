@@ -1,24 +1,25 @@
 package chatManagement;
 
 import java.security.NoSuchAlgorithmException;
+import java.sql.SQLException;
 import java.util.ArrayList;
 
 import userManagement.User;
 
 public class Chat {
-	private static long idForChats = -1;
+	protected static long idForChats = -1;
 	protected static ArrayList<Chat> list_chats = new ArrayList<>();
 	
 	private long id;
 	
-	public Chat() {
-		idForChats ++;
-		this.id = idForChats;
+	public Chat(long id) {
+		this.id = id;
 	}
 	
-	public static void creat_chat(int type, String username) throws NoSuchAlgorithmException {
+	public static void creat_chat(int type, String username) throws NoSuchAlgorithmException, ClassNotFoundException, SQLException {
 		if(type == 1) {
-			GroupChat g_chat = GroupChat.creat_Group_chat(username);
+			idForChats ++;
+			GroupChat g_chat = GroupChat.creat_Group_chat(username, idForChats);
 			if (g_chat == null) {
 				return;
 			}
@@ -26,7 +27,8 @@ public class Chat {
 			return;
 		}
 		if(type == 2) {
-			PrivateChat p_chat = PrivateChat.creat_private_chat(username);
+			idForChats ++;
+			PrivateChat p_chat = PrivateChat.creat_private_chat(username, idForChats);
 			if (p_chat == null) {
 				return;
 			}

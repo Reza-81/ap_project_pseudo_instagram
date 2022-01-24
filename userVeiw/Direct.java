@@ -1,6 +1,7 @@
 package userVeiw;
 
 import java.security.NoSuchAlgorithmException;
+import java.sql.SQLException;
 
 import chatManagement.Chat;
 import chatManagement.Message;
@@ -11,7 +12,7 @@ import userManagement.User;
 
 public class Direct {
 
-	public static void run(User user, Chat chat) throws NoSuchAlgorithmException {
+	public static void run(User user, Chat chat) throws NoSuchAlgorithmException, ClassNotFoundException, SQLException {
 		if(chat instanceof PrivateChat) {
 			System.out.println("*** welcom to the '" + ((PrivateChat) chat).getName(user.getUsername()) + "' chat:");
 		}

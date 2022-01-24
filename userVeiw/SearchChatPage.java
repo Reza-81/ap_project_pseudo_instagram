@@ -1,6 +1,7 @@
 package userVeiw;
 
 import java.security.NoSuchAlgorithmException;
+import java.sql.SQLException;
 
 import chatManagement.Chat;
 import tools.GetInput;
@@ -8,7 +9,7 @@ import userManagement.User;
 
 public class SearchChatPage {
 
-	public static void run(User user) throws NoSuchAlgorithmException {
+	public static void run(User user) throws NoSuchAlgorithmException, ClassNotFoundException, SQLException {
 		while(true) {
 			System.out.println("*** you can go to the chat with enter 'chat id'.\n"
 			                 + "    -if you want to see chat messages and send message enter 'chat id'\n"

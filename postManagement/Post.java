@@ -3,9 +3,12 @@ package postManagement;
 import java.io.File;
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 
+import database.PostDatabase;
 import tools.GetInput;
 import tools.ShowImage;
 import userManagement.User;
@@ -18,21 +21,35 @@ public class Post {
 	private String file_path;
 	private String username;
 	private String caption;
-	private LocalDateTime date;
+	private String date;
 	private ArrayList<String> list_tags = new ArrayList<>();
 	private ArrayList<String> list_likes = new ArrayList<>();
 	
-	public Post(String username, String caption, String file_path, ArrayList<String> list_tags) throws NoSuchAlgorithmException {
-		idForPosts ++;
-		this.id = idForPosts;
+	public Post(long id, String username, String caption, String file_path, String date, ArrayList<String> list_tags) throws NoSuchAlgorithmException {
+		this.id = id;
 		this.username = username;
 		this.file_path = file_path;
-		this.date = LocalDateTime.now();
+		this.date = date;
 		this.caption = caption;
 		this.list_tags = list_tags;
 	}
 	
-	public static Post creat_post(String username) throws NoSuchAlgorithmException {
+	public static void load_post_from_database() throws NoSuchAlgorithmException, SQLException, ClassNotFoundException {
+		PostDatabase data = new PostDatabase();
+		ResultSet result;
+		
+		result = data.getPostDatabase();
+		Post post;
+		while(result.next()) {
+			idForPosts = Long.parseLong(result.getString("id"));
+			post = new Post(Long.parseLong(result.getString("id")), result.getString("username"), result.getString("caption")
+				, result.getString("file_path"), result.getString("date"), GetInput.get_list(result.getString("list_tags")));
+			post.list_likes = GetInput.get_list(result.getString("list_likes"));
+			list_posts.add(post);
+		}
+	}
+	
+	public static Post creat_post(String username) throws NoSuchAlgorithmException, ClassNotFoundException, SQLException {
 		System.out.println("*** enter the image path:");
 		System.out.println(" like: E:\\advanced programing\\elon.jpg");
 		String file_path = GetInput.get_string();
@@ -52,16 +69,22 @@ public class Post {
 			}
 			list_tags.add(temp);
 		}
-		list_posts.add(new Post(username, caption, file_path, list_tags));
+		idForPosts ++;
+		list_posts.add(new Post(idForPosts, username, caption, file_path, LocalDateTime.now().toString(), list_tags));
+		
+		ArrayList<String> temp = new ArrayList<>();
+		PostDatabase.addPost(Long.toString(idForPosts), file_path, username, caption, LocalDateTime.now().toString(), list_tags.toString(), temp);
 		return list_posts.get(list_posts.size() - 1);
 	}
 	
-	public void like(String username) {
+	public void like(String username) throws ClassNotFoundException, SQLException {
 		list_likes.add(username);
+		PostDatabase.update_list_likes(list_likes, Long.toString(id));
 	}
 	
-	public void dislike(String username) {
+	public void dislike(String username) throws ClassNotFoundException, SQLException {
 		list_likes.remove(username);
+		PostDatabase.update_list_likes(list_likes, Long.toString(id));
 	}
 	
 	public long getId() {
@@ -76,7 +99,7 @@ public class Post {
 		this.caption = caption;
 	}
 	
-	public LocalDateTime getDate() {
+	public String getDate() {
 		return date;
 	}
 	
@@ -145,7 +168,7 @@ public class Post {
 		return following_posts;
 	}
 	
-	public boolean show_post(Post post, User user) throws NoSuchAlgorithmException, IOException {
+	public boolean show_post(Post post, User user) throws NoSuchAlgorithmException, IOException, ClassNotFoundException, SQLException {
 		if(User.search(username).getList_blocks().contains(user.getUsername())) {
 			System.out.println("you can't see the " + username + " posts and profile!\n");
 			System.out.println("because you blocked by " + username);
@@ -165,34 +188,39 @@ public class Post {
 		System.out.println("===========================");
 		ShowImage.run(new File(file_path));
 		
-		if(list_likes.contains(user.getUsername())) {
-			System.out.println("*if you want to dislike the post enter 1 or not enter 0: ");
-			if(GetInput.get_number() == 1) {
-				post.dislike(user.getUsername());
-				System.out.println("you disliked this post!");
-			}
-		}
-		else {
-			System.out.println("*if you want to like the post enter 1 or not enter 0: ");
-			if(GetInput.get_number() == 1) {
-				post.like(user.getUsername());
-				System.out.println("you liked this post!");
-			}
-		}
-		
-		System.out.println("*if you want to see the comments enter 1 or not enter 0: ");
-		if(GetInput.get_number() == 1) {
-			for(Comment comment : Comment.get_comments(id)) {
-				comment.show_comment();
-			}
-			System.out.println("===========================");
-		}
-		
-		System.out.println("*if you want put comment enter 1 or not enter 0: ");
-		if(GetInput.get_number() == 1) {
-			System.out.println("enter your comment:");
-			Comment.put_comment(user.getUsername(), id);
-			System.out.println("you commented on this post!");
+		System.out.println("if you want enter one of these options:");
+		System.out.println("1.like");
+		System.out.println("2.dislike");
+		System.out.println("3.see comments");
+		System.out.println("4.put comment");
+		System.out.println("5.skip");
+		int selectedOption = GetInput.get_number();
+		switch (selectedOption){
+			case 1:
+				if(!list_likes.contains(user.getUsername())) {
+					post.like(user.getUsername());
+					System.out.println("you liked this post!");
+				}
+				break;
+			case 2:
+				if(list_likes.contains(user.getUsername())) {
+					post.dislike(user.getUsername());
+					System.out.println("you disliked this post!");
+				}
+				break;
+			case 3:
+				for(Comment comment : Comment.get_comments(id)) {
+					comment.show_comment();
+				}
+				System.out.println("===========================");
+				break;
+			case 4:
+				System.out.println("enter your comment:");
+				Comment.put_comment(user.getUsername(), id);
+				System.out.println("you commented on this post!");
+				break;
+			case 5:
+				break;
 		}
 		return true;
 	}
